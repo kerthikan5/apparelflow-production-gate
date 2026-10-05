@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+enum Role {
+  cutting_supervisor
+  cutting_verifier
+  sewing_supervisor
+}
+enum OrderStatus {
+  CUTTING_IN_PROGRESS
+  PENDING_VERIFICATION
+  REJECTED
+  VERIFIED
+}
+enum Decision {
+  APPROVED
+  REJECTED
+}
+enum Signal {
+  GREEN
+  YELLOW
+  RED
+}
+model User {
+  id String @id @default(cuid())
+  email String @unique
+  passwordHash String
+  role Role
+  fullName String
+  createdAt DateTime @default(now())
+  sessions Session[]
+  orders CuttingOrder[]
+  logs VerificationLog[]
+}
+model Session {
+  id String @id
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  @@index([expiresAt])
+}
+model Recipe {
+  id String @id @default(cuid())
+  recipeCode String @unique
+  name String
+  category String
+  stdFabricYards Decimal @db.Decimal(10, 4)
+  wastageCap Decimal @db.Decimal(6, 2)
+  components RecipeComponent[]
+  orders CuttingOrder[]
+}
+model RecipeComponent {
+  id String @id @default(cuid())
+  recipeId String
+  recipe Recipe @relation(fields: [recipeId], references: [id])
+  componentName String
+  piecesPerGarment Int
+  imageUrl String?
+  items VerificationItem[]
+  @@unique([recipeId, componentName])
+}
+model CuttingOrder {
+  id String @id @default(cuid())
+  orderNo Int @unique @default(autoincrement())
+  recipeId String
+  recipe Recipe @relation(fields: [recipeId], references: [id])
+  targetQty Int
+  fabricRollId String
+  actualFabricYds Decimal @db.Decimal(12, 4)
+  status OrderStatus @default(CUTTING_IN_PROGRESS)
+  createdBy String
+  creator User @relation(fields: [createdBy], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  version Int @default(0)
+  assemblyStartedAt DateTime?
+  items VerificationItem[]
+  logs VerificationLog[]
+  @@index([status, createdAt])
+  @@index([createdBy])
+}
+model VerificationItem {
+  id String @id @default(cuid())
+  orderId String
+  order CuttingOrder @relation(fields: [orderId], references: [id])
+  componentId String
+  component RecipeComponent @relation(fields: [componentId], references: [id])
+  expectedQty Int
+  actualQty Int?
+  status Signal?
+  @@unique([orderId, componentId])
+}
+model VerificationLog {
+  id String @id @default(cuid())
+  orderId String
+  order CuttingOrder @relation(fields: [orderId], references: [id])
+  verifierId String
+  verifier User @relation(fields: [verifierId], references: [id])
+  decision Decision
+  rejectionNote String?
+  wastagePct Decimal @db.Decimal(14, 4)
+  snapshot Json
+  timestamp DateTime @default(now())
+  @@index([orderId, timestamp])
+}
