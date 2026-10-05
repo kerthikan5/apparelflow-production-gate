@@ -98,6 +98,16 @@ node scripts/contrast.mjs
 npm run build
 ```
 
+After deployment, the same critical workflow can be checked against the public server without exposing credentials in source control:
+
+```powershell
+$env:BASE_URL="https://your-production-domain.example"
+$env:DEMO_PASSWORD="your-disposable-demo-password"
+npm run test:remote
+```
+
+The remote test creates clearly labeled `REMOTE-*` demo batches and intentionally leaves one pending batch to verify queue isolation. It does not delete production data.
+
 `npm test` requires `.env.test` with a dedicated PostgreSQL database name ending in `_test`. The local helper creates it. For a managed test database, copy `.env.example` to `.env.test` and point it to a separate database; set the demo password and origin `http://localhost:3100`. The runner refuses a database without the `_test` suffix, applies migrations, seeds, starts a real HTTP server on port 3100, then executes the integration suite. It never resets or drops the database. Repeated runs add isolated test orders. Port 3100 must be free.
 
 Tests cover the five required cases plus excess, malformed/missing/duplicate/unknown counts, unauthorized order/queue access, forged authority, stale versions, concurrent approval, correction history, invalid transitions, assembly, persisted counts, and direct SQL immutability. See [`tests/integration.test.ts`](tests/integration.test.ts). CI runs against a separate PostgreSQL 17 service and the production server.
@@ -118,13 +128,13 @@ Before submission, use a connected browser to inspect desktop/mobile layout, key
 
 ## Deployment and public repository handoff
 
-The application has been prepared locally, not published. To publish, provide access to the target GitHub account/organization (authenticated Git or the GitHub connector), a repository name, and a hosting project with access to set environment variables. A managed PostgreSQL connection string is also required. Use the provider's secret settings rather than pasting credentials into source files.
+The application is published at **https://apparelflow-production-gate.vercel.app** with source at **https://github.com/kerthikan5/apparelflow-production-gate**. The public deployment uses Vercel and managed PostgreSQL. GitHub Actions verifies the build and integration suite on pushes to `main`.
 
 1. Create a **public** GitHub repository and push the actual local commit history. Do not include `.env*`, `.postgres`, `.tools` or `node_modules`.
 2. Provision persistent PostgreSQL. Use a direct connection for `prisma migrate deploy`; if the runtime uses a connection pool, ensure interactive transactions are supported and use the provider's Prisma guidance.
 3. Configure `DATABASE_URL`, exact HTTPS `APP_ORIGIN`, `DEMO_PASSWORD` and the optional public demo password. Run migrations and seed against that database. When seeding from provider environment variables without an `.env` file, run `npx tsx prisma/seed.ts`.
 4. On a Node.js hosting service use `npm ci && npm run build` to build and `npm start` to serve. Run migrations as a release step. On Vercel, import the repository using the Next.js preset and the same build command. This is a server application; static GitHub Pages hosting will not work.
-5. Open the deployed URL, execute the walkthrough and run API checks against a separate hosted test database. Verify HTTPS cookies and the exact origin. Confirm the final repository is public and the URL remains live for the evaluator.
+5. Open the deployed URL, execute the walkthrough and run API checks. Verify HTTPS cookies and the exact origin. Confirm the repository remains public and the URL remains live for the evaluator.
 
 For real factory use beyond this assessment, remove public demonstration credentials, provision individual accounts, configure provider-level authentication rate limiting, monitoring and backups, and add pagination beyond the latest 200 batches. These operational extensions are not represented as completed.
 

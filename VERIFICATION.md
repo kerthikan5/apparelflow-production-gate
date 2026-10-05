@@ -1,6 +1,6 @@
 # Verification record
 
-Verification date: 2026-10-05. No cloud deployment or public repository exists yet.
+Verification date: 2026-10-05. The project is connected to the public GitHub repository and deployed at `https://apparelflow-production-gate.vercel.app`. The deployment returned HTTP 200 and passed the reusable remote workflow test.
 
 | Check | Result | Evidence / scope |
 |---|---|---|
@@ -14,8 +14,12 @@ Verification date: 2026-10-05. No cloud deployment or public repository exists y
 | Final production-server integration run | PASS | `TEST_PRODUCTION=1 npm test`: 16 passed, 0 failed, 0 skipped against built Next.js and PostgreSQL; includes exact recipe regression |
 | Browser workflow / screenshots | NOT VERIFIED | `cua.listBrowsers()` returned no browsers; in-app and Chrome creation both reported unavailable |
 | Responsive layout, rendered focus and dropdowns | NOT VERIFIED | CSS implemented, but no connected browser for visual inspection |
-| GitHub Actions | NOT RUN | Workflow prepared locally; repository not published |
-| Hosted PostgreSQL / HTTPS / public URL | NOT VERIFIED | Requires hosting/database account access |
+| GitHub Actions | PASS | Public API reports `Verify production gate` run 37299781039 completed successfully on `main` |
+| Hosted PostgreSQL / HTTPS / public URL | PASS | Vercel URL returned HTTP 200; authenticated production workflow passed against the hosted database |
+
+## Deployed backend verification
+
+`BASE_URL=https://apparelflow-production-gate.vercel.app npm run test:remote` passed against the production Vercel deployment and Neon database. It authenticated all three roles; confirmed non-verifier approval returns 403; confirmed shortage, missing-count, and blank-reason requests return 422; excluded rejected and pending orders from the Sewing Queue; corrected and resubmitted a rejection; persisted a Yellow count across a fresh request; approved Yellow; preserved rejection and approval audit history; started assembly; confirmed assembly persisted; and rejected a repeated start with 409. The run creates clearly labeled `REMOTE-*` demo batches, including an intentionally pending batch.
 
 ## Contrast measurements
 

@@ -12,7 +12,8 @@
     "db:migrate": "prisma migrate deploy",
     "db:seed": "tsx --env-file=.env prisma/seed.ts",
     "db:local": "tsx scripts/local-db.ts",
-    "test": "tsx --env-file=.env.test scripts/test.ts"
+    "test": "tsx --env-file=.env.test scripts/test.ts",
+    "test:remote": "node scripts/remote-smoke.mjs"
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",

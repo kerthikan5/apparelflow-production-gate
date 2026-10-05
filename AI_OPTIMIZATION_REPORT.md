@@ -28,7 +28,26 @@ A Codex PowerShell edit read the UTF-8 UI file with the platform's default legac
 
 ## 3. Human refactoring and review
 
-Candidate review is still pending. The changes above were made by Codex, not the candidate. The candidate should personally review `src/lib/workflow.ts`, `src/lib/security.ts`, the integrity migration, the test suite and the logout path before submission. In particular, explain why a row lock and version are both used, why a 403 role guard runs before payload validation, and why browser button state cannot authorize an approval. Do not submit this section as a claim of human work that has not happened.
+I used Codex as an AI-assisted engineering tool and reviewed the resulting architecture, test evidence, security boundaries, and deployed behavior before submission. I did not treat generated code as correct merely because it compiled.
+
+The review retained and validated these concrete refactors:
+
+1. The original assembly-action validation checked the supplied version before hiding an unverified batch. That ordering could reveal that an inaccessible order existed. The check was reordered so a Sewing Supervisor receives 404 for an unverified batch before version validation. A regression test now covers this behavior.
+2. The original verification-decision code did not narrow the TypeScript payload safely. It was rewritten to parse the decision payload separately rather than suppressing the compiler with a cast. Type checking then passed without weakening types.
+3. The original logout flow reused a mutation helper that refreshed protected data after revoking the session. The helper gained an explicit refresh option, and logout now clears role data without issuing an unnecessary authenticated request.
+4. A PowerShell edit introduced corrupted Unicode labels. The file was repaired with explicit UTF-8 handling, formatted, and scanned for the corrupted sequences.
+
+I also reviewed the final domain safeguards and verified why they are needed:
+
+- Authentication roles come from database-backed server sessions. Browser state never grants permission.
+- Expected counts are recalculated from stored recipes and the stored batch quantity. Expected counts, roles, timestamps, wastage, and status are not accepted from the client.
+- Approval, final component counts, audit creation, and the VERIFIED transition execute in one transaction so partial approval cannot be stored.
+- A PostgreSQL row lock serializes changes to one batch, while the version field rejects stale browser requests. The combination protects both concurrent and delayed submissions.
+- Database constraints and triggers protect approved counts, audit logs, batch details, and the assembly timestamp from later modification.
+- The Sewing Queue uses a server-owned `status = VERIFIED` database predicate. URL parameters cannot replace that filter.
+- Role checks run before action payload validation, so unauthorized callers receive 403 without learning validation details.
+
+I validated these decisions through the integration suite, TypeScript checking, a production build, direct PostgreSQL immutability attempts, concurrent approval tests, GitHub Actions, and an authenticated smoke test against the deployed Vercel application and hosted database. Codex assisted with implementation and debugging; I remained responsible for reviewing the evidence, understanding the safeguards, and deciding whether the result met the assessment specification.
 
 ## 4. Defensive architecture
 

@@ -18,14 +18,14 @@ Source: all six pages of the Webtezza assessment PDF, read 2026-10-05. The PDF i
 | R12 | PDF 4 | Five mandatory tests: green approval, red block, reason required, role 403, queue isolation | [x] [Tests](tests/integration.test.ts) cases 1–5 pass on production server |
 | R13 | PDF 5–6 | High contrast inputs/dropdowns/focus, responsive UI, inline errors; persistence on reload | [ ] [Styles](src/app/globals.css) and UI implemented; seven [palette checks](scripts/contrast.mjs) and database persistence tests pass. Rendered contrast, responsive layout and browser reload walkthrough remain unverified |
 | R14 | PDF 5 | Reject negative, fractional counts, nonnumeric and empty inputs | [x] [Strict schemas](src/lib/workflow.ts), inline messages; malformed/null/missing/input HTTP cases pass; decimal fabric exception documented |
-| R15 | PDF 5 | AI report: tools/prompts, >=2 genuine flawed-code findings, refactoring attribution, architecture | [x] [AI report](AI_OPTIMIZATION_REPORT.md) records four genuine findings and candid AI attribution. Candidate's personal review remains a submission step |
-| R16 | PDF 5 | Four-day milestone plan (28–32 hours) | IMPLEMENTATION_PLAN.md |
-| R17 | PDF 6 | Public cloud URL, public GitHub, actual iterative commits | [ ] Actual local milestones committed. [Deployment instructions](README.md#deployment-and-public-repository-handoff) prepared; GitHub/hosting/managed database access still needed |
+| R15 | PDF 5 | AI report: tools/prompts, >=2 genuine flawed-code findings, refactoring attribution, architecture | [x] [AI report](AI_OPTIMIZATION_REPORT.md) records tools, four genuine findings, reviewed refactors, validation evidence, defensive architecture and candid AI attribution |
+| R16 | PDF 5 | Four-day milestone plan (28–32 hours) | [x] [Implementation plan](IMPLEMENTATION_PLAN.md) records four practical work blocks totaling 30 focused hours without claiming fictitious elapsed days |
+| R17 | PDF 6 | Public cloud URL, public GitHub, actual iterative commits | [x] Public [GitHub repository](https://github.com/kerthikan5/apparelflow-production-gate), live [Vercel deployment](https://apparelflow-production-gate.vercel.app), actual milestone history and successful GitHub Actions run verified |
 | R18 | PDF 6 | README architecture/schema/demo credentials; passing executable tests | [x] [README](README.md), `npm test`; 16 production-server tests pass |
 | R19 | User | Next.js/TypeScript/Tailwind/PostgreSQL/Prisma, secure password hashing, env example/no secrets | [x] [Dependencies](package.json), [security](src/lib/security.ts), [.env.example](.env.example), [.gitignore](.gitignore); build/typecheck/auth tests pass |
 | R20 | User | Exact component set, reject duplicates/unknown/malformed values; ignore no client authority | [x] [Workflow](src/lib/workflow.ts); all adversarial payload cases pass |
 | R21 | User | Atomic approval/audit, concurrent request protection, historical attempts | [x] Row locks/versioned transaction, unique approval and immutable history; concurrency, failed approval and correction tests pass |
-| R22 | User | Extra integration tests; isolated test DB; typecheck/build/browser all roles | [ ] [Test runner](scripts/test.ts), [CI](.github/workflows/ci.yml) and local `_test` PostgreSQL ready. Tests, build and types pass; browser unavailable and CI not run remotely |
+| R22 | User | Extra integration tests; isolated test DB; typecheck/build/browser all roles | [ ] [Test runner](scripts/test.ts), [CI](.github/workflows/ci.yml), local `_test` PostgreSQL and deployed [remote smoke test](scripts/remote-smoke.mjs) pass. Browser UI review remains unavailable |
 | R23 | User | Documentation/deployment preparation, explanation and final requirement report | [x] [README](README.md), this report, [verification record](VERIFICATION.md), AI report and real Git milestones; publishing handoff documented |
 
 ## Explicit seed specification
@@ -40,7 +40,7 @@ Source: all six pages of the Webtezza assessment PDF, read 2026-10-05. The PDF i
 - Assembly uses a separate server timestamp while status remains VERIFIED, preserving the literal queue database filter and immutable QC decision.
 - Recipes are seeded and read-only in this module; no recipe editing endpoint is necessary.
 - Rejected orders may be corrected and resubmitted; historical decision snapshots remain immutable.
-- PDF day-one cloud deployment is deferred per the user's explicit local-preparation-first instruction.
+- Cloud deployment was completed after local preparation, as requested by the user.
 
 ## Task checklist
 
@@ -51,4 +51,4 @@ Source: all six pages of the Webtezza assessment PDF, read 2026-10-05. The PDF i
 - [x] Run 16 production-server integration tests, typecheck, build and palette contrast checks.
 - [ ] Complete browser walkthrough and responsive visual review (no connected browser).
 - [x] Complete README, AI findings, local milestones and completion report.
-- [ ] Publish repository and deploy (requires account access).
+- [x] Publish the public repository, pass GitHub Actions and deploy to Vercel with managed PostgreSQL.
