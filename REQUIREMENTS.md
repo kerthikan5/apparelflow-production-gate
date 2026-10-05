@@ -4,29 +4,29 @@ Source: all six pages of the Webtezza assessment PDF, read 2026-10-05. The PDF i
 
 | ID | Source | Requirement | Implementation / verification |
 |---|---|---|---|
-| R01 | PDF 1–2 | Only production batch verification and sewing gate; persistent full-stack app | Pending |
-| R02 | PDF 2,4 | Authenticated three roles, visible demo credentials, server separation of duties | Pending |
-| R03 | PDF 3 | Exact REC-BL01 and REC-CT02 recipes, categories, five components each, fabric and caps | Pending |
-| R04 | PDF 3 | Recipe, whole target quantity, roll ID, actual yards; immediate expected multipliers | Pending |
-| R05 | PDF 2–3 | Cutting preparation, pending submission, verified approval, reasoned rejection and correction | Pending |
-| R06 | PDF 3–4 | Green match, yellow excess allowed, red shortage blocks UI and API (422) | Pending |
-| R07 | PDF 4 | Missing/uncounted blocks; non-verifier approval 403; server session identity/time | Pending |
-| R08 | PDF 2,4 | Immutable persisted approval audit: verifier, timestamp, variances, wastage | Pending |
-| R09 | PDF 3–4 | Sewing database query WHERE status=VERIFIED; counts, attribution, assembly action | Pending |
-| R10 | PDF 3 | Wastage=((actual−expected)/expected)*100; expected=quantity*standard yards | Pending |
-| R11 | PDF 4 | Users, recipes, components (optional image), orders, verification items and logs, relational constraints | Pending |
-| R12 | PDF 4 | Five mandatory tests: green approval, red block, reason required, role 403, queue isolation | Pending |
-| R13 | PDF 5–6 | High contrast inputs/dropdowns/focus, responsive UI, inline errors; persistence on reload | Pending |
-| R14 | PDF 5 | Reject negative, fractional counts, nonnumeric and empty inputs | Pending |
-| R15 | PDF 5 | AI report: tools/prompts, >=2 genuine flawed-code findings, refactoring attribution, architecture | Pending |
+| R01 | PDF 1–2 | Only production batch verification and sewing gate; persistent full-stack app | [x] [UI](src/app/page.tsx), [API](src/app/api/%5B...path%5D/route.ts), [16 passing integration tests](tests/integration.test.ts); cloud delivery tracked separately |
+| R02 | PDF 2,4 | Authenticated three roles, visible demo credentials, server separation of duties | [x] [Security](src/lib/security.ts), API role guards and login panel; HTTP role/forged-cookie tests pass; visual review pending |
+| R03 | PDF 3 | Exact REC-BL01 and REC-CT02 recipes, categories, five components each, fabric and caps | [x] [Seed](prisma/seed.ts); exact recipe integration test passes |
+| R04 | PDF 3 | Recipe, whole target quantity, roll ID, actual yards; immediate expected multipliers | [x] [OrderForm](src/app/page.tsx), [server createOrder](src/lib/workflow.ts); invalid-order and expected-count tests pass; browser interaction pending |
+| R05 | PDF 2–3 | Cutting preparation, pending submission, verified approval, reasoned rejection and correction | [x] [actOnOrder](src/lib/workflow.ts); transition/correction/history tests pass |
+| R06 | PDF 3–4 | Green match, yellow excess allowed, red shortage blocks UI and API (422) | [x] [Batch UI](src/app/page.tsx), [workflow](src/lib/workflow.ts); green/red/yellow HTTP tests pass; button behavior source-reviewed, not browser-verified |
+| R07 | PDF 4 | Missing/uncounted blocks; non-verifier approval 403; server session identity/time | [x] [API](src/app/api/%5B...path%5D/route.ts) and workflow; missing, tampering and role tests pass |
+| R08 | PDF 2,4 | Immutable persisted approval audit: verifier, timestamp, variances, wastage | [x] [Integrity migration](prisma/migrations/202610050002_integrity/migration.sql), transaction snapshot; HTTP plus direct database immutability tests pass |
+| R09 | PDF 3–4 | Sewing database query WHERE status=VERIFIED; counts, attribution, assembly action | [x] [listOrders](src/lib/workflow.ts) and Batch UI; queue-param isolation, assembly and hidden-order regression tests pass |
+| R10 | PDF 3 | Wastage=((actual−expected)/expected)*100; expected=quantity*standard yards | [x] [Decimal arithmetic](src/lib/workflow.ts); 94.5 / 90 yard case persists 5% in integration test |
+| R11 | PDF 4 | Users, recipes, components (optional image), orders, verification items and logs, relational constraints | [x] [Schema](prisma/schema.prisma), two applied SQL migrations; relational persistence and immutable triggers exercised |
+| R12 | PDF 4 | Five mandatory tests: green approval, red block, reason required, role 403, queue isolation | [x] [Tests](tests/integration.test.ts) cases 1–5 pass on production server |
+| R13 | PDF 5–6 | High contrast inputs/dropdowns/focus, responsive UI, inline errors; persistence on reload | [ ] [Styles](src/app/globals.css) and UI implemented; seven [palette checks](scripts/contrast.mjs) and database persistence tests pass. Rendered contrast, responsive layout and browser reload walkthrough remain unverified |
+| R14 | PDF 5 | Reject negative, fractional counts, nonnumeric and empty inputs | [x] [Strict schemas](src/lib/workflow.ts), inline messages; malformed/null/missing/input HTTP cases pass; decimal fabric exception documented |
+| R15 | PDF 5 | AI report: tools/prompts, >=2 genuine flawed-code findings, refactoring attribution, architecture | [x] [AI report](AI_OPTIMIZATION_REPORT.md) records four genuine findings and candid AI attribution. Candidate's personal review remains a submission step |
 | R16 | PDF 5 | Four-day milestone plan (28–32 hours) | IMPLEMENTATION_PLAN.md |
-| R17 | PDF 6 | Public cloud URL, public GitHub, actual iterative commits | Local preparation first; account access later |
-| R18 | PDF 6 | README architecture/schema/demo credentials; passing executable tests | Pending |
-| R19 | User | Next.js/TypeScript/Tailwind/PostgreSQL/Prisma, secure password hashing, env example/no secrets | Pending |
-| R20 | User | Exact component set, reject duplicates/unknown/malformed values; ignore no client authority | Pending |
-| R21 | User | Atomic approval/audit, concurrent request protection, historical attempts | Pending |
-| R22 | User | Extra integration tests; isolated test DB; typecheck/build/browser all roles | Pending |
-| R23 | User | Documentation/deployment preparation, explanation and final requirement report | Pending |
+| R17 | PDF 6 | Public cloud URL, public GitHub, actual iterative commits | [ ] Actual local milestones committed. [Deployment instructions](README.md#deployment-and-public-repository-handoff) prepared; GitHub/hosting/managed database access still needed |
+| R18 | PDF 6 | README architecture/schema/demo credentials; passing executable tests | [x] [README](README.md), `npm test`; 16 production-server tests pass |
+| R19 | User | Next.js/TypeScript/Tailwind/PostgreSQL/Prisma, secure password hashing, env example/no secrets | [x] [Dependencies](package.json), [security](src/lib/security.ts), [.env.example](.env.example), [.gitignore](.gitignore); build/typecheck/auth tests pass |
+| R20 | User | Exact component set, reject duplicates/unknown/malformed values; ignore no client authority | [x] [Workflow](src/lib/workflow.ts); all adversarial payload cases pass |
+| R21 | User | Atomic approval/audit, concurrent request protection, historical attempts | [x] Row locks/versioned transaction, unique approval and immutable history; concurrency, failed approval and correction tests pass |
+| R22 | User | Extra integration tests; isolated test DB; typecheck/build/browser all roles | [ ] [Test runner](scripts/test.ts), [CI](.github/workflows/ci.yml) and local `_test` PostgreSQL ready. Tests, build and types pass; browser unavailable and CI not run remotely |
+| R23 | User | Documentation/deployment preparation, explanation and final requirement report | [x] [README](README.md), this report, [verification record](VERIFICATION.md), AI report and real Git milestones; publishing handoff documented |
 
 ## Explicit seed specification
 
@@ -46,8 +46,9 @@ Source: all six pages of the Webtezza assessment PDF, read 2026-10-05. The PDF i
 
 - [x] Read complete specification and inspect empty workspace.
 - [x] Record requirements and practical four-day plan.
-- [ ] Implement schema, authentication, seeds and migrations.
-- [ ] Implement protected workflow and responsive role workspaces.
-- [ ] Run integration tests, typecheck, build and browser walkthrough.
-- [ ] Complete README, AI findings, local commits and completion report.
+- [x] Implement schema, authentication, seeds and migrations; verify with PostgreSQL.
+- [x] Implement protected workflow and role workspaces; build and typecheck pass.
+- [x] Run 16 production-server integration tests, typecheck, build and palette contrast checks.
+- [ ] Complete browser walkthrough and responsive visual review (no connected browser).
+- [x] Complete README, AI findings, local milestones and completion report.
 - [ ] Publish repository and deploy (requires account access).

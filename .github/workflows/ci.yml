@@ -1,0 +1,36 @@
+name: Verify production gate
+on: [push, pull_request]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: apparelflow
+          POSTGRES_PASSWORD: ci-disposable-password
+          POSTGRES_DB: apparelflow_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U apparelflow"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://apparelflow:ci-disposable-password@localhost:5432/apparelflow_test?schema=public
+      APP_ORIGIN: http://localhost:3100
+      DEMO_PASSWORD: CI-Disposable-Demo-Password
+      NEXT_PUBLIC_DEMO_PASSWORD: CI-Disposable-Demo-Password
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run db:generate
+      - run: npm run typecheck
+      - run: node scripts/contrast.mjs
+      - run: npm run build
+      - run: touch .env.test
+      - run: npm test
+        env:
+          TEST_PRODUCTION: "1"
